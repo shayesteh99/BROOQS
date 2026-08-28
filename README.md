@@ -51,14 +51,11 @@ Leaf labels in the gene trees must match the leaf labels in the tree of blobs.
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--rooted` | off | Trust the rooting of the tree of blobs: never reroot it. If a blob's inferred hybrid turns out to be the "outside" group, the next-best hybrid is used instead. Recommended when your tree of blobs has a known outgroup. |
-| `--contract` | off | When three consecutive components of a cycle are too close in the spectral embedding to order confidently (betweenness fails), collapse them into a polytomy inside the cycle instead of forcing an arbitrary order. |
-| `--min-blob-size` `N` | 2 | Leave blobs with `N` or fewer children unresolved (kept as polytomies). The effective minimum is 4 — smaller blobs cannot form a cycle. |
-| `--dist-var` | off | For size-4 blobs (3 children), identify the hybrid from the **variance of pairwise gene-tree distances** rather than from the spectral score alone. Requires `--rooted`. |
+| `--min-blob-size` `N` | 4 | Leave blobs with `N` or fewer children unresolved (kept as polytomies). The effective minimum is 4 — smaller blobs cannot form a cycle. By default, BROOQS resolves all polytomies of size>3. |
+| `--dist-var` | off | For 4-blobs, identify the hybrid from the **variance of pairwise gene-tree distances** rather than random assignment. Requires `--rooted`. |
 | `--dist-var-k` `K` | 5 | Number of random representative-leaf draws used for the `--dist-var` majority vote. |
 | `--filter` | off | Use only gene trees that contain **all** components of a blob (instead of down-weighting incomplete ones). |
-| `-r`, `--rate` `R` | 0 | Randomly drop each leaf from each gene tree with probability `R` before analysis. Mainly for robustness experiments. |
-| `-m`, `--mode` | `keep` | With `--rate`: `keep` never removes the last leaf of a component from a tree; `free` allows it. |
-| `-s`, `--seed` `S` | 1142 | Random seed (affects `--rate` and `--dist-var`). |
+| `-s`, `--seed` `S` | 1142 | Random seed (affects `--dist-var`). |
 
 ## Example
 
@@ -75,7 +72,7 @@ Run BROOQS on it:
 
 ```bash
 cd Example
-brooqs -i true_genetrees.tree -t true_tob.nwk --rooted -o brooqs_network.enewick
+brooqs -i true_genetrees.tree -t true_tob.nwk -o brooqs_network.enewick
 ```
 
 The tree of blobs has a single blob with seven children:
