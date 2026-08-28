@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# virtual envs
+.venv/
+venv/
+env/
+
+# BROOQS output
+*_network.enewick
+Example/brooqs_network.enewick

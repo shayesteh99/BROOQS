@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brooqs"
+version = "0.1.0"
+description = "Infer level-1 phylogenetic networks from a tree of blobs and gene trees"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "shayesteh99" }]
+keywords = [
+    "phylogenetics",
+    "phylogenetic-networks",
+    "tree-of-blobs",
+    "gene-trees",
+    "quartets",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "numpy>=2.0",
+    "treeswift>=1.1.28",
+]
+
+[project.urls]
+Homepage = "https://github.com/shayesteh99/BROOQS"
+Repository = "https://github.com/shayesteh99/BROOQS"
+
+[project.scripts]
+brooqs = "count_quartets:main"
+
+[tool.setuptools]
+py-modules = ["count_quartets"]
