@@ -3,12 +3,8 @@
 **BROOQS** infers a **level-1 phylogenetic network** from a **tree of blobs** and a
 collection of **gene trees**.
 
-A tree of blobs captures *where* reticulation happened (each multifurcating node,
-or "blob", marks a region of the species history that is not tree-like) but not
-*how*. BROOQS resolves every blob into a level-1 cycle: for each blob it builds a
-quartet-based signal matrix (the *F* matrix) from the gene trees, computes a
-spectral cyclic ordering of the blob's components, picks the hybrid, and stitches
-the cycles back together. The result is a phylogenetic network in
+BROOQS resolves a tree of blobs into a level-1 network: for each blob, it builds a
+quartet-based similarity matrix (the *F*-matrix) from the gene trees, computes a cyclic ordering of the blob's components, picks the hybrid, and creates the cycle. The result is a phylogenetic level-1 network in
 [eNewick](http://dx.doi.org/10.1186/1471-2105-9-532) format.
 
 ## Installation
@@ -51,7 +47,7 @@ Leaf labels in the gene trees must match the leaf labels in the tree of blobs.
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--rooted` | off | Trust the rooting of the tree of blobs: never reroot it. If a blob's inferred hybrid turns out to be the "outside" group, the next-best hybrid is used instead. Recommended when your tree of blobs has a known outgroup. |
-| `--min-blob-size` `N` | 4 | Leave blobs with `N` or fewer children unresolved (kept as polytomies). The effective minimum is 4 — smaller blobs cannot form a cycle. By default, BROOQS resolves all polytomies of size>3. |
+| `--min-blob-size` `N` | 4 | Leave blobs with fewer that `N-1` children unresolved (kept as polytomies). The effective minimum is 4. By default, BROOQS resolves all polytomies of size>3. |
 | `--dist-var` | off | For 4-blobs, identify the hybrid from the **variance of pairwise gene-tree distances** rather than random assignment. Requires `--rooted`. |
 | `--dist-var-k` `K` | 5 | Number of random representative-leaf draws used for the `--dist-var` majority vote. |
 | `--filter` | off | Use only gene trees that contain **all** components of a blob (instead of down-weighting incomplete ones). |
@@ -99,4 +95,4 @@ You can visualize/compare the eNewick networks with tools such as
 
 ## Citation
 
-If you use BROOQS in your work, please cite this repository.
+If you use BROOQS in your work, please cite [this](https://www.biorxiv.org/content/10.64898/2026.08.31.748319v2) paper.
