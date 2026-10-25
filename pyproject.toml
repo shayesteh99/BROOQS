@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "brooqs"
-version = "0.1.0"
+version = "0.2.0"
 description = "Infer level-1 phylogenetic networks from a tree of blobs and gene trees"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -36,4 +36,4 @@ Repository = "https://github.com/shayesteh99/BROOQS"
 brooqs = "count_quartets:main"
 
 [tool.setuptools]
-py-modules = ["count_quartets"]
+py-modules = ["count_quartets", "circular_seriation"]

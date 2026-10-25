@@ -17,6 +17,7 @@ from treeswift import *
 import math
 import random
 import warnings
+from circular_seriation import brooqs_step2
 warnings.filterwarnings("ignore")
 
 def is_number(x):
@@ -397,10 +398,16 @@ def spectral_cycle_order(F, similarity='direct', eps=1e-12, alpha=0.2):
                     # print(order)
     # --- end F-based swap ---
 
-    min_score = float('Inf')
-    hybrid = None
-    hubrid_ind = None
+    order, alt_hybrid_idx, alt_score = select_hybrid(F, order)
+    return order, alt_hybrid_idx, alt_score, angles
 
+
+def select_hybrid(F, order):
+    """Pick the hybrid on the cyclic `order`: the component whose two neighbours have
+    the smallest F. Returns (order rotated so the hybrid is first, alt_hybrid_idx,
+    alt_score)."""
+    m = len(order)
+    order = list(order)
     scores = [(F[order[i], order[(i+2)%m]], (i+1)%m) for i in range(len(order))]
     scores.sort(key=lambda t: t[0])
     print(scores)
@@ -415,7 +422,19 @@ def spectral_cycle_order(F, similarity='direct', eps=1e-12, alpha=0.2):
     alt_score = ((scores[1][0] - scores[0][0]) / scores[0][0]
                  if len(scores) > 1 and scores[0][0] != 0 else float('inf'))
 
-    return order, alt_hybrid_idx, alt_score, angles
+    return order, alt_hybrid_idx, alt_score
+
+
+def spectral_angles(F):
+    """Angles of the components in the (v2, v3) Laplacian embedding, as computed in
+    spectral_cycle_order (used by --contract)."""
+    F = np.asarray(F, dtype=float)
+    S = F.copy()
+    np.fill_diagonal(S, 0.0)
+    S = 0.5 * (S + S.T)
+    L = np.diag(S.sum(axis=1)) - S
+    _, eigvecs = np.linalg.eigh(L)
+    return np.arctan2(eigvecs[:, 2], eigvecs[:, 1])
 
 
 def compute_gene_weights(trees, groups, annotations, alpha=1):
@@ -537,11 +556,12 @@ def identify_hybrid_by_dist_var(children_leaf_sets, gene_trees, k=5):
     return winner
 
 
-def build_network_newick(tob, trees, rate = 0, mode = "free", contract = False, rooted = False, filter = False, min_blob_size = 4, dist_var = False, dist_var_k = 5):
+def build_network_newick(tob, trees, rate = 0, mode = "free", contract = False, rooted = False, filter = False, min_blob_size = 4, dist_var = False, dist_var_k = 5, order_mode = "spectral"):
     """Convert a tree of blobs to a phylogenetic network in eNewick format.
 
     Three phases, tob is only modified between phases 1 and 3:
-      1. Traverse every polytomy (tob unchanged) and compute F + spectral order.
+      1. Traverse every polytomy (tob unchanged) and compute F + cyclic order
+         (spectral or PQ-tree, per order_mode).
       2. Apply any needed reroots to tob (outside == hybrid case).
       3. Build the eNewick string using the stored orders.
     """
@@ -616,7 +636,13 @@ def build_network_newick(tob, trees, rate = 0, mode = "free", contract = False, 
         print(F)
         print(sum(F))
 
-        order, alt_hybrid_idx, alt_score, angles = spectral_cycle_order(F)
+        if order_mode == "pq_tree":
+            pq_order, pq_info = brooqs_step2(F)
+            print("PQ-tree order:", pq_order, pq_info)
+            order, alt_hybrid_idx, alt_score = select_hybrid(F, pq_order)
+            angles = spectral_angles(F)
+        else:
+            order, alt_hybrid_idx, alt_score, angles = spectral_cycle_order(F)
         h_idx = order[0]
         print(h_idx, order)
 
@@ -727,6 +753,7 @@ def build_network_newick(tob, trees, rate = 0, mode = "free", contract = False, 
         if needs_reroot:
             r_label = reroot_leaf.label
             reroot_leaf.edge_length = 1
+            tob.root.edge_length = None
             tob.reroot(reroot_leaf, length=0.5)
             for c in tob.root.child_nodes():
                 c.edge_length = None
@@ -924,6 +951,8 @@ def main():
                       help="Number of random-leaf repetitions for --dist-var majority vote (default: 5)")
   parser.add_argument('--min-blob-size', type=int, default=2, metavar='N',
                       help="Skip resolving blobs with <= N children; leave them as polytomies (default: 2)")
+  parser.add_argument('--order-mode', required=False, default="spectral", choices=["spectral", "pq_tree"],
+                      help="How to compute the cyclic order of each blob: spectral embedding, or the PQ-tree circular seriation (default: spectral)")
 
 
   start = time.time()
@@ -951,7 +980,7 @@ def main():
       parser.error("--dist-var requires --rooted")
   dist_var_k = args.dist_var_k
   min_blob_size = max(4,int(args.min_blob_size))
-  network_newick = build_network_newick(tob, input_trees, rate = rate, mode = mode, contract = contract, rooted = rooted, filter = args.filter, min_blob_size = min_blob_size, dist_var = dist_var, dist_var_k = dist_var_k)
+  network_newick = build_network_newick(tob, input_trees, rate = rate, mode = mode, contract = contract, rooted = rooted, filter = args.filter, min_blob_size = min_blob_size, dist_var = dist_var, dist_var_k = dist_var_k, order_mode = args.order_mode)
   print(network_newick)
 
   end = time.time()
