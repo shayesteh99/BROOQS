@@ -55,7 +55,7 @@ Leaf labels in the gene trees must match the leaf labels in the tree of blobs.
 | `--dist-var` | off | For 4-blobs, identify the hybrid from the **variance of pairwise gene-tree distances** rather than random assignment. Requires `--rooted`. |
 | `--dist-var-k` `K` | 5 | Number of random representative-leaf draws used for the `--dist-var` majority vote. |
 | `--filter` | off | Use only gene trees that contain **all** components of a blob (instead of down-weighting incomplete ones). |
-| `--order-mode` `{spectral,pq_tree}` | `spectral` | How the cyclic order of each blob is computed: the spectral embedding of the *F* matrix, or PQ-tree circular seriation (`circular_seriation.py`). |
+| `--order-mode` `{spectral,pq_tree}` | `spectral` | How the cyclic order of each blob is computed: the spectral embedding of the *F* matrix, or PQ-tree circular seriation (`circular_seriation.py`). Default is `spectral` (which is shown to be more accurate than `pq_tree`). |
 | `-s`, `--seed` `S` | 1142 | Random seed (affects `--dist-var`). |
 
 ## Example
